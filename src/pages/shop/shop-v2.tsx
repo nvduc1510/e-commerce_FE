@@ -20,7 +20,7 @@
         const [minValue, setMinValue] = useState<number>();
         const [maxValue, setMaxValue] = useState<number>();
         const [currentPage, setCurrentPage] = useState(1);
-        const [search, setSearch] = useState("");
+        const [search] = useState("");
         const limitProduct = 10;
         const [selectCategoryByCheckbox, setSelectCategoryByCheckbox] = useState<number[]>([]);
         
@@ -29,10 +29,6 @@
                 pre.includes(categoryId) ? pre.filter(id => id !== categoryId) : [...pre, categoryId]
             )
         }
-
-        const paramsCategory = useMemo(() => ({
-            keyword: search,
-        }), [search]);
 
         const paramsProducts = useMemo(() => ({
             page: currentPage - 1,
@@ -44,11 +40,11 @@
         }), [currentPage, limitProduct, search,selectCategoryByCheckbox, minValue, maxValue]);
 
         const {products, totalRecords} = useProductList(paramsProducts)
-        const { categories,loading, error, params, setParams } = useCategory();
+        const { categories, error } = useCategory();
 
         useEffect(()=>{
             Aos.init()
-        }, )
+        }, [])
 
     return (
         <>

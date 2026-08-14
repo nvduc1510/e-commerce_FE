@@ -1,20 +1,36 @@
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
-
+import { useEffect, useState } from "react";
 import NavbarOne from "../../components/navbar/navbar-one";
-import bg from '../../assets/img/shortcode/breadcumb.jpg'
+import bg from '../../assets/img/shortcode/breadcumb.jpg';
 import AccountTab from "../../components/account/account-tab";
 import FooterOne from "../../components/footer/footer-one";
 import ScrollToTop from "../../components/scroll-to-top";
-
 import { LuMail, LuMapPin, LuPhoneCall } from "react-icons/lu";
-
 import Aos from "aos";
+import API from "@/components/utils/auth/axiosInterceptor";
 
 export default function MyProfile() {
-    useEffect(()=>{
-        Aos.init()
-    })
+    const [profile, setProfile] = useState<any>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        Aos.init();
+        fetchUserProfile();
+    }, []);
+
+    const fetchUserProfile = async () => {
+        try {
+            const res = await API.get('http://localhost:8080/api/user/me');
+            if (res.data && res.data.params) {
+                setProfile(res.data.params);
+            }
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
   return (
     <>
         <NavbarOne/>
@@ -37,28 +53,36 @@ export default function MyProfile() {
                         <AccountTab/>
                     </div>
                     <div className="w-full md:w-auto md:flex-1 overflow-auto">
-                        <div className="w-full max-w-[951px] bg-[#F8F8F9] dark:bg-dark-secondary p-5 sm:p-8 lg:p-[50px]">
-                            <div data-aos="fade-up" data-aos-delay="200">
-                                <h3 className="font-semibold leading-none">Kathlene Roser</h3>
-                                <span className="leading-none mt-3">Product Designer</span>
-                            </div>
-                            <p className="text-base sm:text-lg mt-5 sm:mt-8 md:mt-10 text-justify" data-aos="fade-up" data-aos-delay="300">
-                                All the Lorem Ipsum generators on the Internet tend to repeat predefined on the Internet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Non, lobortis in in tortor lectus iaculis viverra. Adipiscing lobortis interdum fringilla euismod odio vitae nam pulvinar elementum. Nibh purus integer elementum in. Tellus vulputate habitasse ut vulputate posuere habitant vel tempor varius. 
-                            </p>
-                            <div className="mt-5 sm:mt-8 md:mt-10 grid gap-4 sm:gap-6" data-aos="fade-up" data-aos-delay="400">
-                                <Link to="#" className="flex items-center gap-2">
-                                    <LuPhoneCall className="text-primary size-5"/>
-                                    <span className="leading-none font-medium text-base sm:text-lg">+111 - (1234 5678 99)</span>
-                                </Link>
-                                <Link to="#" className="flex items-center gap-2">
-                                    <LuMail className="text-primary size-5"/>
-                                    <span className="leading-none font-medium text-base sm:text-lg">furnixar123@gmail.com</span>
-                                </Link>
-                                <Link to="#" className="flex items-center gap-2">
-                                    <LuMapPin className="text-primary size-5"/>
-                                    <span className="leading-none font-medium text-base sm:text-lg">23/ A Lake Side , New Arizona , USA</span>
-                                </Link>
-                            </div>
+                        <div className="w-full max-w-[951px] bg-[#F8F8F9] dark:bg-dark-secondary p-5 sm:p-8 lg:p-[50px] rounded-xl">
+                            {loading ? (
+                                <p className="text-slate-500">Loading profile...</p>
+                            ) : (
+                                <>
+                                    <div data-aos="fade-up" data-aos-delay="200">
+                                        <h3 className="font-semibold leading-none text-2xl dark:text-white">{profile?.fullName || profile?.username || 'User Profile'}</h3>
+                                        <span className="leading-none mt-3 text-primary font-medium block">
+                                            Role: {Array.isArray(profile?.role) ? profile?.role.join(', ') : (profile?.role || 'Customer')}
+                                        </span>
+                                    </div>
+                                    <p className="text-base sm:text-lg mt-5 sm:mt-8 md:mt-10 text-slate-600 dark:text-gray-300" data-aos="fade-up" data-aos-delay="300">
+                                        Welcome to your account profile dashboard! Here you can review your registered contact information, manage orders, and check account preferences.
+                                    </p>
+                                    <div className="mt-5 sm:mt-8 md:mt-10 grid gap-4 sm:gap-6" data-aos="fade-up" data-aos-delay="400">
+                                        <div className="flex items-center gap-3">
+                                            <LuPhoneCall className="text-primary size-5 flex-none"/>
+                                            <span className="leading-none font-medium text-base sm:text-lg dark:text-white">{profile?.phone || 'No phone provided'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <LuMail className="text-primary size-5 flex-none"/>
+                                            <span className="leading-none font-medium text-base sm:text-lg dark:text-white">{profile?.email || 'No email provided'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <LuMapPin className="text-primary size-5 flex-none"/>
+                                            <span className="leading-none font-medium text-base sm:text-lg dark:text-white">{profile?.address || 'No address registered'}</span>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

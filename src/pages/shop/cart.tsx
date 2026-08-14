@@ -17,7 +17,7 @@ import { formatCurrency } from '@/components/utils/commonFormat';
 
 export default function Cart() {
     const userId = getUserIdFromToken();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<any>();
     const cartItems = useSelector((state : RootState) => state.cart.items || [])    
     useEffect(()=>{
         if(userId != null) {
@@ -55,7 +55,7 @@ export default function Cart() {
                                     </tr>
                                 </thead>
                                 <tbody className="table-body">
-                                    {cartItems.map(cart => (
+                                    {cartItems.map((cart: any) => (
                                         <tr className="" key={cart?.cartId}>
                                             <td className="md:w-[42%]">
                                                 <div className="flex items-center gap-3 md:gap-4 lg:gap-6 cart-product my-4">

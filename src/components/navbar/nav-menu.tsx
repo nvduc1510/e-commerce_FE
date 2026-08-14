@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { cartList, wishListData } from '../../data/nav-data';
-
-
+import { wishListData } from '../../data/nav-data';
 import { LuSearch,LuX} from "react-icons/lu";
 import { GoHeart } from "react-icons/go";
 import {RiShoppingBag4Line} from 'react-icons/ri'
 import Switcher from '../switcher';
-import IncreDre from '../incre-dre';
 import { blogTag } from '../../data/blog';
+
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { useAuth } from '../utils/auth/authContext';
 
 interface NavMenuProps {
     toggle: boolean;
@@ -21,15 +22,30 @@ export default function NavMenu({toggle, setToggle}: NavMenuProps) {
     const [cart, setCart] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(false)
 
+    const cartItems = useSelector((state: RootState) => state.cart?.items || []);
+    const cartCount = cartItems.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+    const { isAuthenticated, logout, isAdmin } = useAuth();
+
   return (
     <div className="flex items-center gap-4 sm:gap-6">
-        <Link to="/login" className="text-lg leading-none text-title dark:text-white transition-all duration-300 hover:text-primary hidden lg:block">Login</Link>
+        {isAuthenticated ? (
+            <div className="flex items-center gap-3 hidden lg:flex">
+                {isAdmin() && (
+                    <Link to="/admin" className="px-3 py-1 bg-amber-500 text-white rounded-full text-xs font-semibold hover:bg-amber-600 transition-all">Admin Dashboard</Link>
+                )}
+                <Link to="/my-profile" className="text-lg leading-none text-title dark:text-white transition-all duration-300 hover:text-primary">My Profile</Link>
+                <button onClick={logout} className="text-xs px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white rounded hover:bg-red-500 hover:text-white transition-all">Logout</button>
+            </div>
+        ) : (
+            <Link to="/login" className="text-lg leading-none text-title dark:text-white transition-all duration-300 hover:text-primary hidden lg:block">Login</Link>
+        )}
+
         <button className="hdr_search_btn" aria-label="search" onClick={()=>setOpen(!open)}>
             <LuSearch className="text-title dark:text-white size-6"/>
         </button>
 
         <button className="relative hdr_wishList_btn" onClick={()=>setWishList(!wishList)}>
-            <span className="absolute w-[22px] h-[22px] bg-secondary -top-[10px] -right-[11px] rounded-full flex items-center justify-center text-xs leading-none text-white">14</span>
+            <span className="absolute w-[22px] h-[22px] bg-secondary -top-[10px] -right-[11px] rounded-full flex items-center justify-center text-xs leading-none text-white">0</span>
             <GoHeart className="text-title dark:text-white size-6"/>
         </button>
 
@@ -65,40 +81,40 @@ export default function NavMenu({toggle, setToggle}: NavMenuProps) {
         </div>
 
         <button className="relative hdr_cart_btn" onClick={()=> setCart(!cart)}>
-            <span className="absolute w-[22px] h-[22px] bg-secondary -top-[10px] -right-[11px] rounded-full flex items-center justify-center text-xs leading-none text-white">22</span>
+            <span className="absolute w-[22px] h-[22px] bg-secondary -top-[10px] -right-[11px] rounded-full flex items-center justify-center text-xs leading-none text-white">{cartCount}</span>
             <RiShoppingBag4Line className="text-title dark:text-white size-6"/>
         </button>
 
         <div className={`hdr_cart_popup w-80 md:w-96 absolute z-50 top-full right-0 sm:right-10 xl:right-0 bg-white dark:bg-title p-5 md:p-[30px] border border-primary ${cart ? '' : 'hidden'}`}>
-            <h4 className="font-medium leading-none mb-4 text-xl md:text-2xl">Cart List</h4>
+            <h4 className="font-medium leading-none mb-4 text-xl md:text-2xl text-slate-800 dark:text-white">Cart List</h4>
             <div>
-                <div className="hdr-cart-item">
-                    {cartList.map((item,index)=>{
-                        return(
-                            <div className="flex gap-[15px] relative pb-[15px] mb-[15px] border-b border-bdr-clr dark:border-bdr-clr-drk group" key={index}>
-                                <Link to="/product-details" className="block">
-                                    <img className="w-[70px] md:w-auto h-full" src={item.image} alt="cart"/>
-                                </Link>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] md:text-[15px] leading-none block">{item.name}</span>
-                                        <span className="w-[6px] h-[6px] rounded-full bg-primary"></span>
-                                        <span className="text-[14px] md:text-[15px] leading-none block">{item.value}</span>
+                <div className="hdr-cart-item max-h-60 overflow-y-auto">
+                    {cartItems.length === 0 ? (
+                        <p className="text-slate-500 text-sm py-4">Your cart is empty.</p>
+                    ) : (
+                        cartItems.map((item: any, index: number) => {
+                            return (
+                                <div className="flex gap-[15px] relative pb-[15px] mb-[15px] border-b border-bdr-clr dark:border-bdr-clr-drk group" key={item.variantId || index}>
+                                    <Link to={`/product-details/${item.productId}`} className="block w-16 flex-none">
+                                        <img className="w-full h-auto rounded" src={item.thumbnailImage ? `../../../assets/img/gallery/product/${item.thumbnailImage}` : item.image} alt="cart"/>
+                                    </Link>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[14px] md:text-[15px] font-semibold text-slate-800 dark:text-white leading-none block">{item.productName || item.name || 'Product'}</span>
+                                        </div>
+                                        <div className="mt-2 text-sm text-slate-600 dark:text-gray-300 font-medium">
+                                            Qty: {item.quantity} x ${item.price}
+                                        </div>
                                     </div>
-                                    <h6 className="text-base md:text-lg font-semibold !leading-none mt-[10px] mb-4">
-                                        <Link to="/product-details">{item.desc}</Link>
-                                    </h6>
-                                   <IncreDre/>
                                 </div>
-                                <div className="wishList_item_close absolute top-0 right-0 w-6 h-6 flex items-center justify-center bg-title dark:bg-white bg-opacity-10 dark:bg-opacity-10 group hover:bg-primary dark:hover:bg-primary opacity-0 group-hover:opacity-100 text-title dark:text-white duration-300 hover:text-white">
-                                    <LuX className="text-title dark:text-white duration-300 group-hover:text-white"/>
-                                </div>
-                            </div>
-                        )
-                    })}
+                            );
+                        })
+                    )}
                 </div>
                 <div className="pt-5 md:pt-[30px] mt-5 md:mt-[30px] border-t border-bdr-clr dark:border-bdr-clr-drk">
-                    <h4 className="mb-5 md:mb-[30px] font-medium !leading-none text-lg md:text-xl text-right">Subtotal : $870</h4>
+                    <h4 className="mb-5 md:mb-[30px] font-medium !leading-none text-lg md:text-xl text-right text-slate-800 dark:text-white">
+                        Subtotal : ${cartItems.reduce((acc: number, item: any) => acc + (item.price || 0) * (item.quantity || 1), 0)}
+                    </h4>
                     <div className="grid grid-cols-2 gap-4">
                         <Link to="/cart" className="btn btn-outline btn-sm" data-text="View Cart">
                             <span>View Cart</span>

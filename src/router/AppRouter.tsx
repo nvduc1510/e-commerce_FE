@@ -48,6 +48,7 @@ import BlogDetailsV3 from '@/pages/blog/blog-details-v3'
 import BlogTag from '@/pages/blog/blog-tag'
 import Contact from '@/pages/inner-pages/contact'
 import ProductCategory from '@/pages/shop/product-category'
+import AdminDashboard from '@/pages/admin/AdminDashboard'
 export default function AppRouter () {
     return (
         <Routes>
@@ -105,6 +106,7 @@ export default function AppRouter () {
             <Route path="/blog-tag" element={<BlogTag/>} />
             <Route path="/contact" element={<Contact/>} />
             <Route path="/product-category" element={<ProductCategory/>} />
+            <Route path="/admin" element={<AdminDashboard/>} />
         </Routes>
     )
 }

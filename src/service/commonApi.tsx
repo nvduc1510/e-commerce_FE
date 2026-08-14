@@ -58,11 +58,11 @@ export const apiCart = {
         return res.data.params;
     },
     updateItemInCart: async(params: CartRequest) =>{
-        const res = await API.put(`${API_URL}/user/cart/update`, {params})
+        const res = await API.put(`${API_URL}/user/cart/update`, params)
         return res.data.params;
     },
     removeAnItemFormCart: async(params: CartRequest) => {
-        const res = await API.delete(`${API_URL}/user/cart/delete-item?userId=${params?.cartId}&&productId=${params?.productId}`)
+        const res = await API.delete(`${API_URL}/user/cart/delete-item?userId=${params?.userId || params?.cartId}&variantId=${params?.productId}`)
         return res.data;
     },
     totalQuantity : async(params: CartRequest) =>{
