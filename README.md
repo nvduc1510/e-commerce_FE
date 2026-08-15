@@ -1,50 +1,108 @@
-# React + TypeScript + Vite
+# Furnixar E-Commerce — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ứng dụng giao diện người dùng cho dự án thương mại điện tử Furnixar. Xây dựng bằng **React 18 + TypeScript + Vite**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠 Yêu cầu hệ thống
 
-## Expanding the ESLint configuration
+| Công cụ | Phiên bản tối thiểu |
+|---|---|
+| Node.js | 18+ |
+| npm | 9+ |
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+---
 
-- Configure the top-level `parserOptions` property like this:
+## 🚀 Hướng dẫn chạy
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. Cài dependencies
+
+```bash
+cd e-commerce_FE
+npm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 2. Chạy development server
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm run dev
 ```
+
+Frontend khởi động tại: **http://localhost:5173**
+
+> ⚠️ **Backend phải chạy trước** tại `http://localhost:8080`, nếu không API calls sẽ thất bại.
+
+---
+
+## ⚙️ Cấu hình API URL
+
+File cấu hình base URL nằm ở:
+
+```
+src/service/commonApi.tsx
+```
+
+Mặc định kết nối tới backend local:
+
+```ts
+const BASE_URL = "http://localhost:8080";
+```
+
+Nếu backend chạy ở địa chỉ khác, cập nhật giá trị này.
+
+---
+
+## 📋 Các lệnh npm
+
+| Lệnh | Mô tả |
+|---|---|
+| `npm run dev` | Chạy development server (hot reload) |
+| `npm run build` | Build production bundle |
+| `npm run preview` | Xem trước bản build production |
+| `npm run lint` | Kiểm tra lỗi ESLint |
+
+---
+
+## 🏗 Cấu trúc project
+
+```
+src/
+├── components/      # Reusable UI components
+│   ├── navbar/      # Navigation bar
+│   ├── product/     # Product card, listing components
+│   └── ...
+├── pages/           # Page components
+│   ├── auth/        # Login, Register
+│   ├── shop/        # Product listing, Cart
+│   ├── account/     # My Profile, Order History, Wishlist
+│   └── admin/       # Admin dashboard, management pages
+├── router/          # React Router config (AppRouter.tsx)
+├── service/         # API calls (commonApi.tsx)
+├── store/           # State management (Redux/Context)
+├── hooks/           # Custom React hooks
+├── model/           # TypeScript interfaces/types
+└── data/            # Static data
+```
+
+---
+
+## 🔐 Phân quyền
+
+| Trang | Quyền truy cập |
+|---|---|
+| Trang chủ, Shop, Chi tiết sản phẩm | Public |
+| Đăng nhập / Đăng ký | Public |
+| Giỏ hàng, Wishlist, Đặt hàng | Đăng nhập (ROLE_USER) |
+| Dashboard Admin | ROLE_ADMIN |
+
+---
+
+## 🔗 Kết nối Backend
+
+Frontend giao tiếp với backend qua REST API:
+
+- **Base URL**: `http://localhost:8080`
+- **Authentication**: JWT Bearer Token (lưu trong `localStorage`)
+- **CORS**: Backend đã cấu hình cho phép `localhost:5173`
+
+Đảm bảo backend đang chạy trước khi mở frontend. Xem hướng dẫn chạy backend tại [`e-commerce_be/README.md`](../e-commerce_be/README.md).
